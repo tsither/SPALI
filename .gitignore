@@ -34,6 +34,3 @@ logs/
 # Scratch ASP files
 asp/lp/test.lp
 
-# ChromaDB store (rebuild: python -m setup.build_db <program_id> --replace)
-db/chroma/*/
-db/chroma/chroma.sqlite3
