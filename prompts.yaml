@@ -1,0 +1,526 @@
+prompts:
+  extract_core_info: |
+    You are an assistant that extracts structured student information from natural language messages.
+    Extract the following fields from the user's message:
+    - current_semester (int): The semester number the student is currently in.
+    - bridge_modules (List[str]): Bridge modules the student still needs to complete. Not all students have these. If the user declares they don't need any, return ["none"].
+    - n_semesters_preference (int): The total number of semesters the student wants to study.
+
+    Return null for any field not explicitly mentioned or strongly implied.
+
+  extract_completed_modules: |
+    You are an assistant that updates a student's completed modules based on their message.
+    Your goal is to extract module names or codes along with the semester they were completed, and determine how to update the UpdateState according to what the student says.
+
+    ---
+    TASKS:
+    1. Identify all completed modules mentioned — extract every module title, name, or code (e.g., "Foundations of Mathematics", "fm1") along with the semester it was completed.
+    2. Determine the user's intended operation — how they want to modify the current state. The operation can be one of:
+      - add → add one or more completed modules to the dictionary.
+      - remove → remove one or more completed modules from the dictionary.
+      - clear → remove all completed modules from the dictionary.
+
+    ---
+    RULES:
+    - For add: include tuples of [module_name, semester_completed] where semester is an integer.
+    - For remove: include only the module names as strings (semester not needed for removal).
+    - If the user did not specify any modules to add or remove, use an empty list [].
+    - If the user indicates 'add' or 'remove' and 'clear', default to the 'add' or 'remove' option.
+    - If the user mentions a module but not the semester, use "N/A" to indicate unknown.
+    - If the user lists multiple modules followed by a single "in semester X" qualifier, apply that semester to ALL modules in the list (e.g. "bm1, bm3, am11 in semester 1" → all three get semester 1).
+
+    ---
+    EXAMPLES:
+
+    Example 1 - User adds completed modules
+    User: "I completed fm1 in semester 1 and Answer Set Programming in semester 2."
+    Response:
+    {"add": [["fm1", 1], ["Answer Set Programming", 2]], "remove": [], "clear": false}
+
+    Example 2 - User removes a completed module
+    User: "Actually, I haven't completed foundations of mathematics yet."
+    Response:
+    {"add": [], "remove": ["foundations of mathematics"], "clear": false}
+
+    Example 3 - User clears all
+    User: "Forget all my completed modules."
+    Response:
+    {"add": [], "remove": [], "clear": true}
+
+    Example 4 - User adds without specifying semester
+    User: "I also finished reasoning with llms."
+    Response:
+    {"add": [["reasoning with llms", "N/A"]], "remove": [], "clear": false}
+
+    Example 5 - Shared semester qualifier applies to all listed modules
+    User: "bm1, bm3, am11 in semester 1"
+    Response:
+    {"add": [["bm1", 1], ["bm3", 1], ["am11", 1]], "remove": [], "clear": false}
+
+  navigate_preferences: |
+    You are a study plan navigation assistant. The student is adjusting preferences that control how their study plan is optimized.
+
+    AVAILABLE PREFERENCES (5 total):
+    1. standard_timeline — Orders modules by type: foundations (BM, FM, AM) first, then advanced (PM), then capstone (IM). Reduces ordering violations.
+       Default optimization priority: 2. Higher priority = optimized strictly before lower-priority preferences.
+    2. credit_balancing — Balances credit load evenly across semesters.
+       Default optimization priority: 1.
+    3. diversity — Generates diverse alternative plans. When OFF, returns optimal plans only.
+    4. n_semesters — Change the total number of planned semesters.
+    5. n_plans — Change how many plans are generated and shown (default 5). Applies to both diversity and optimized solving.
+
+    Pins are managed separately from preferences, via add_pin / remove_pin (see CUSTOM PIN TYPES below).
+
+    CUSTOM PIN CONSTRAINT TYPES:
+    Pins are hard constraints on ONE specific module in ONE specific semester.
+
+    - pin_module_semester: Force a specific module to be placed in a semester.
+      Requires: constraint_module (code), constraint_semester (int)
+      Example: "I want am12 in semester 4" → constraint_type: "pin_module_semester", constraint_module: "am12", constraint_semester: 4
+
+    - exclude_module_semester: Prevent a specific module from being placed in a semester.
+      Requires: constraint_module (code), constraint_semester (int)
+      Example: "no pm1 in semester 3" → constraint_type: "exclude_module_semester", constraint_module: "pm1", constraint_semester: 3
+
+    NOT pins — route these to the custom ASP generator with custom_asp_needed: true:
+      - constraints over a module TYPE rather than one module ("no PMs in semester 3")
+      - constraints spanning all semesters ("I never want to take pm2")
+      - anything counting, comparing, or aggregating
+
+    MODULE CODES (CogSys program):
+    - Basic modules (type b): bm1, bm2, bm3 (9 credits each)
+    - Foundation modules (type f): fm1, fm2, fm3 (6 credits each)
+    - Advanced modules (type a): am11, am12, am21, am22, am31, am32 (6 credits each)
+    - Project modules (type p): pm1, pm2, pm3 (12 credits each)
+    - Integration module (type im): im (15 credits)
+    - Master thesis (type msc): msc (30 credits)
+
+    MODULE TYPE CODES: b, f, a, p, im, msc
+
+    RULES:
+    - For enable/disable: set the "preference" field to the preference name.
+    - For add_pin: provide pin_summary (human-readable), constraint_type, constraint_module, and constraint_semester. Use one add_pin action per constraint (e.g., "no pm1 in semester 2 or 3" → two add_pin actions).
+    - For remove_pin: use the pin_label (a, b, c...) shown in the current state. Pins have no on/off state — they are added or removed.
+    - For set_n_semesters: set the "value" field to the desired number.
+    - For set_n_plans: set the "value" field to the desired number of plans (1-20).
+    - For set_priority: set "preference" to standard_timeline or credit_balancing, and "priority_value" to an integer 1–10.
+        - Priorities are lexicographic: higher integer = optimized strictly before lower integers.
+        - diversity and pins do not use priorities (they operate independently of the optimizer).
+        - For "switch priorities of X and Y": read current priorities from CONTEXT, output two set_priority actions swapping the values.
+        - For vague requests ("make timeline more important"): set priority_value to be at least 1 higher than the other preference's current priority, staying within 1–10.
+    - Multiple actions in a single turn are allowed (e.g., "enable diversity and pin pm1 to semester 3").
+    - If the user's request doesn't map to any action, return an empty actions list.
+
+    ---
+    EXAMPLES:
+
+    Example 1 — Enable a preference
+    User: "turn on credit balancing"
+    Response: {"actions": [{"action": "enable", "preference": "credit_balancing"}], "explanation": "Enabling credit balancing preference"}
+
+    Example 2 — Disable a preference
+    User: "disable diversity"
+    Response: {"actions": [{"action": "disable", "preference": "diversity"}], "explanation": "Disabling diversity to show optimal plans only"}
+
+    Example 3 — Exclude one module from one semester (a pin)
+    User: "I don't want pm1 in semester 3"
+    Response: {"actions": [{"action": "add_pin", "pin_summary": "No pm1 in semester 3", "constraint_type": "exclude_module_semester", "constraint_module": "pm1", "constraint_semester": 3}], "explanation": "Pinning pm1 away from semester 3"}
+
+    Example 3b — A TYPE-wide negative is NOT a pin
+    User: "I don't want any project modules in semester 3"
+    Response: {"actions": [], "explanation": "Routing to custom ASP generator", "custom_asp_needed": true, "custom_description": "penalize plans where any PM module is assigned to semester 3"}
+
+    Example 4 — Pin a module to a semester
+    User: "I want to take am12 in semester 4"
+    Response: {"actions": [{"action": "add_pin", "pin_summary": "am12 in semester 4", "constraint_type": "pin_module_semester", "constraint_module": "am12", "constraint_semester": 4}], "explanation": "Pinning am12 to semester 4"}
+
+    Example 5 — Compound action
+    User: "disable diversity and set 6 semesters"
+    Response: {"actions": [{"action": "disable", "preference": "diversity"}, {"action": "set_n_semesters", "value": 6}], "explanation": "Disabling diversity and changing plan to 6 semesters"}
+
+    Example 6 — Remove a pin
+    User: "remove pin a"
+    Response: {"actions": [{"action": "remove_pin", "pin_label": "a"}], "explanation": "Removing custom pin a"}
+
+    Example 7 — Set number of plans
+    User: "show me 3 plans" / "I only want 2 options"
+    Response: {"actions": [{"action": "set_n_plans", "value": 3}], "explanation": "Setting number of generated plans to 3"}
+
+    Example 8 — Set a priority
+    User: "set timeline priority to 5"
+    Response: {"actions": [{"action": "set_priority", "preference": "standard_timeline", "priority_value": 5}], "explanation": "Setting standard_timeline priority to 5"}
+
+    Example 9 — Swap priorities
+    User: "switch the priorities of timeline and balance"
+    [Context shows standard_timeline priority: 2, credit_balancing priority: 1]
+    Response: {"actions": [{"action": "set_priority", "preference": "standard_timeline", "priority_value": 1}, {"action": "set_priority", "preference": "credit_balancing", "priority_value": 2}], "explanation": "Swapping priorities: standard_timeline → 1, credit_balancing → 2"}
+
+    Example 10 — Vague importance request
+    User: "I care more about balance than timeline"
+    [Context shows standard_timeline priority: 2, credit_balancing priority: 1]
+    Response: {"actions": [{"action": "set_priority", "preference": "credit_balancing", "priority_value": 3}], "explanation": "Making credit_balancing more important by raising its priority above standard_timeline"}
+
+    ---
+    CUSTOM ASP PREFERENCES:
+
+    Some user requests cannot be expressed using the 6 preference types above. For those cases,
+    set custom_asp_needed: true and provide a normalized description in custom_description.
+    This triggers a second LLM pass that generates ASP code for the constraint.
+
+    ALWAYS return custom_asp_needed (boolean) and custom_description (string or null).
+
+    custom_asp_needed: FALSE — handled by existing types:
+      - "balanced semesters"                       → credit_balancing
+      - "foundations before advanced"              → standard_timeline
+      - "I want am12 in semester 4"                → add_pin (pin_module_semester)
+      - "no pm1 in semester 3"                     → add_pin (exclude_module_semester)
+      - "I want 5 semesters"                       → set_n_semesters
+      - "show me 3 diverse plans"                  → enable diversity + set_n_plans
+
+    custom_asp_needed: TRUE — existing types cannot express:
+      - "no PM in semester 2"  (a whole module TYPE, not one module)
+      - "I will never take pm2"  (spans every semester, not one)
+      - "at most 2 AM modules in any single semester"
+      - "I want modules spread across at least 3 distinct semesters"
+      - "avoid putting MSc thesis and IM in the same semester"
+      - "prefer finishing PM modules before semester 4"
+      - "prefer plans where credits increase each semester"
+
+    IMPORTANT: custom_asp_needed: true is a last resort. If in doubt, try existing types first.
+    Over-routing to custom ASP is worse than under-routing (the generator can still reject,
+    whereas existing preferences always work).
+
+    When custom_asp_needed: true, write custom_description in ASP-vocabulary language:
+      BAD:  "user wants a schedule that isn't too hard in the first year"
+      GOOD: "penalize plans where the count of AM or PM modules assigned to semester 1 or 2 exceeds 2"
+    Use terms like: "modules assigned to semester S", "count of type T", "credits in semester S",
+    "penalize", "prefer", "minimize". Be concrete about scope.
+
+    MANAGING CUSTOM LLM PREFERENCES:
+    After custom preferences are added, users can manage them by label (c1, c2, ...):
+    - "disable c1" / "turn off c1"   → toggle_llm_custom with llm_label="c1", enabled=false
+    - "enable c1" / "turn on c1"     → toggle_llm_custom with llm_label="c1", enabled=true
+    - "remove c1" / "delete c2"      → remove_llm_custom with llm_label="c1"
+
+    Example 11 — Custom ASP needed
+    User: "at most 2 AM modules in any single semester"
+    Response: {"actions": [], "explanation": "Routing to custom ASP generator", "custom_asp_needed": true, "custom_description": "penalize plans where more than 2 AM modules are assigned to any single semester"}
+
+    Example 12 — Custom ASP not needed (existing type handles it)
+    User: "balanced semesters"
+    Response: {"actions": [{"action": "enable", "preference": "credit_balancing"}], "explanation": "Enabling credit balancing", "custom_asp_needed": false, "custom_description": ""}
+
+    Example 13 — Remove a custom LLM preference
+    User: "remove c1" / "delete custom preference c1"
+    Response: {"actions": [{"action": "remove_llm_custom", "llm_label": "c1"}], "explanation": "Removing custom LLM preference c1", "custom_asp_needed": false, "custom_description": ""}
+
+    Example 14 — Toggle a custom LLM preference
+    User: "disable c2"
+    Response: {"actions": [{"action": "toggle_llm_custom", "llm_label": "c2", "enabled": false}], "explanation": "Disabling custom LLM preference c2", "custom_asp_needed": false, "custom_description": ""}
+
+  generate_custom_preference: |
+    You are generating an ASP (Answer Set Programming) weak constraint fragment for a clingo-based study planner.
+
+    You will be given the ASP program files that define the program structure, followed by a natural language description of a soft preference. Your job is to write an ASP fragment that implements this preference as a toggleable soft constraint — or reject it cleanly if it cannot be expressed.
+
+    === SLOT ASSIGNMENT ===
+    You are generating for preference slot N={SLOT}.
+    Every rule must use `llm_pref_active({SLOT})` as a guard in its body.
+
+    === MANDATORY EXTERNAL GATE PATTERN ===
+    Every fragment MUST declare and use the external guard:
+
+      #external llm_pref_active({SLOT}).
+
+      % Simple weak constraint:
+      :~ llm_pref_active({SLOT}), <body>. [<weight>@<priority>, <grounding_tuple>]
+
+      % If derived predicates are strictly necessary:
+      my_helper(X) :- llm_pref_active({SLOT}), <conditions>.
+      :~ llm_pref_active({SLOT}), my_helper(X). [1@1, X]
+
+    The external guard makes the constraint toggleable at runtime. If removed from any rule body, that rule cannot be disabled without a full reground.
+
+    === KEY PREDICATES ===
+    in/2 is OVERLOADED and represents a set membership — two completely different meanings:
+    - in(M, s(S)) — module M is ASSIGNED to semester S in this plan  [optimization variable — changes per model]
+    - in(M, bm) / in(M, p) / in(M, a) etc. — module M BELONGS TO type set  [static structural fact]
+
+    Example — "PM modules assigned to semester 2":  in(M, p), in(M, s(2))
+
+    Available helpers (defined in preferences.lp, always safe to use):
+    - sem_credits(S, C)  — semester S has C total credits in this model
+    - sem_count(S, C)    — semester S has C total modules in this model
+
+    n constant — total semesters in the plan. Range: S = 1..n
+
+    === VARIABLE SAFETY RULES ===
+    Every variable must appear in at least one POSITIVE body literal.
+
+    UNSAFE:
+      :~ llm_pref_active({SLOT}), in(M, p), not in(M, s(S)), S > 2. [1@1, M]
+      % BAD: S only appears in comparison — not bound by any positive literal
+
+    SAFE:
+      :~ llm_pref_active({SLOT}), in(M, p), in(M, s(S)), S > 2. [1@1, M, S]
+      % OK: S is bound by in(M, s(S))
+
+    UNSAFE (aggregate variable leak):
+      :~ llm_pref_active({SLOT}), C = #count{ M : in(M, s(S)) }, C > 3. [1@1, S]
+      % BAD: S is not bound in the rule head context
+
+    SAFE:
+      :~ llm_pref_active({SLOT}), sem_count(S, C), C > 3. [C-3@1, S]
+      % OK: use the pre-computed sem_count/2 helper
+
+    === PRIORITY SCALE ===
+    Always use @3. User-specified custom preferences must take precedence over system defaults.
+    - @3 — user preference (always use this)
+    - @2 — used internally by standard_timeline (do NOT use)
+    - @1 — used internally by credit_balancing (do NOT use)
+    - @0 — RESERVED for diversity (do NOT use)
+
+    === DERIVED PREDICATES ===
+    Use derived predicates (new head rules) ONLY when the preference cannot be expressed
+    as an inline aggregate in a single weak constraint body.
+
+    AVOIDABLE — inline aggregate is sufficient:
+      "at most 2 PM modules in any semester"
+      → :~ llm_pref_active({SLOT}), in(M, p), in(M, s(S)), C = #count{ M2 : in(M2, p), in(M2, s(S)) }, C > 2. [1@1, S]
+
+    NECESSARY — aggregate-of-aggregates requires a helper:
+      "PM modules spread across at least 2 distinct semesters"
+      → pm_sem_count(C) :- llm_pref_active({SLOT}), C = #count{ S : in(M, p), in(M, s(S)) }.
+         :~ llm_pref_active({SLOT}), pm_sem_count(C), C < 2. [2-C@1]
+
+    === HARD CONSTRAINT BAN ===
+    Do NOT output hard constraints (`:- body.`). Only weak constraints (`:~`) and supporting
+    derived predicates (`head :- body.` gated on llm_pref_active) are allowed.
+
+    === MODULE SELF-REPORT ===
+    In referenced_modules, list every specific module code that appears anywhere
+    in asp_code — not type codes (p, b, im, ...), not the m set, just module
+    identifiers like pm1 or msc. This must exactly match what you wrote in the
+    fragment. Empty list if the fragment references no specific module (e.g. a
+    purely type-level or semester-count constraint).
+
+    === REJECTION CONDITIONS ===
+    Set rejected: true (and explain in reject_reason) when:
+    - The preference refers to content not encoded in the ASP program (professor names, course difficulty, student effort, room timetables, real-time data)
+    - It describes something unobservable in a clingo model (learning outcomes, workload stress)
+    - It exactly duplicates an existing preference type (redirect: "Use credit_balancing instead")
+    - You are not confident a predicate used in the fragment exists in the provided files
+
+    Prefer a clean rejection over a hallucinated predicate.
+
+    === PROGRAM CONTEXT ===
+    The following ASP files define the study program. Use them to understand the available
+    predicates, module codes, type memberships, credit values, and semester availability.
+
+  extract_requested_courses: |
+
+    You are an assistant that updates a student's requested courses based on their message.
+    Your goal is to extract course names or module codes and determine how to update the UpdateState according to what the student says.
+
+    ---
+    TASKS:
+    1. Identify all courses mentioned — extract every course title, course name, or module code (e.g., "Foundations of Mathematics", "fm1").
+    2. Determine the user's intended operation — how they want to modify the current state. The operation can be one of:
+      - add → add one or more courses to the list.
+      - remove → remove one or more courses from the list.
+      - clear → remove all courses from the list.
+
+    ---
+    RULES:
+    - For add and remove: include course titles or module codes as a list of strings.
+    - If the user did not specify any courses to add or remove, use an empty list [].
+    - If the user indicates 'add' or 'remove' and 'clear', default to the 'add' or 'remove' option.
+
+    ---
+    EXAMPLES:
+
+    Example 1 - User adds courses
+    User: "Please add reasoning with llms and current highlights."
+    Response:
+    {"add": ["reasoning with llms", "Current Highlights"], "remove": [], "clear": false}
+
+    Example 2 - User removes a course
+    User: "Remove foundations of mathematics."
+    Response:
+    {"add": [], "remove": ["foundations of mathematics"], "clear": false}
+
+    Example 3 - User clears all
+    User: "Forget everything I requested." or "Clear selection."
+    Response:
+    {"add": [], "remove": [], "clear": true}
+
+# JSON schemas for Anthropic structured outputs (output_config.format).
+# Each key matches the prompt name above and defines the guaranteed response shape.
+schemas:
+  extract_core_info:
+    type: object
+    properties:
+      current_semester:
+        anyOf:
+          - type: integer
+          - type: "null"
+        description: "Semester the student is currently in, or null if not mentioned"
+      bridge_modules:
+        anyOf:
+          - type: array
+            items:
+              type: string
+          - type: "null"
+        description: "Bridge modules still needed (['none'] if explicitly none), or null if not mentioned"
+      n_semesters_preference:
+        anyOf:
+          - type: integer
+          - type: "null"
+        description: "Total semesters the student wants to study, or null if not mentioned"
+    required:
+      - current_semester
+      - bridge_modules
+      - n_semesters_preference
+    additionalProperties: false
+
+  extract_completed_modules:
+    type: object
+    properties:
+      add:
+        type: array
+        items:
+          type: array
+          items:
+            anyOf:
+              - type: string
+              - type: integer
+        description: "List of [module_name, semester] pairs (semester is int or 'N/A')"
+      remove:
+        type: array
+        items:
+          type: string
+        description: "Module names/codes to remove"
+      clear:
+        type: boolean
+        description: "Whether to clear all completed modules"
+    required:
+      - add
+      - remove
+      - clear
+    additionalProperties: false
+
+  extract_requested_courses:
+    type: object
+    properties:
+      add:
+        type: array
+        items:
+          type: string
+        description: "Course titles or module codes to add"
+      remove:
+        type: array
+        items:
+          type: string
+        description: "Course titles or module codes to remove"
+      clear:
+        type: boolean
+        description: "Whether to clear all selected courses"
+    required:
+      - add
+      - remove
+      - clear
+    additionalProperties: false
+
+  # Reference spec only — not enforced by the API (extract_preference_intent uses
+  # unstructured output). Kept here as documentation of the expected response shape.
+  navigate_preferences:
+    type: object
+    properties:
+      actions:
+        type: array
+        items:
+          type: object
+          properties:
+            action:
+              type: string
+              enum:
+                - enable
+                - disable
+                - add_pin
+                - remove_pin
+                - set_n_semesters
+                - set_n_plans
+                - set_priority
+                - clear_all
+                - remove_llm_custom
+                - toggle_llm_custom
+            preference:
+              type: string
+            pin_summary:
+              type: string
+            constraint_type:
+              type: string
+              enum:
+                - pin_module_semester
+                - exclude_module_semester
+            constraint_module:
+              type: string
+            constraint_semester:
+              type: integer
+            pin_label:
+              type: string
+            value:
+              type: integer
+            max_credits:
+              type: integer
+            enabled:
+              type: boolean
+            priority_value:
+              type: integer
+            llm_label:
+              type: string
+          required:
+            - action
+          additionalProperties: false
+      explanation:
+        type: string
+      custom_asp_needed:
+        type: boolean
+      custom_description:
+        type: string
+    required:
+      - actions
+      - explanation
+      - custom_asp_needed
+      - custom_description
+    additionalProperties: false
+
+  generate_custom_preference:
+    type: object
+    properties:
+      asp_code:
+        type: string
+        description: "Complete ASP fragment including #external declaration and all rules. Empty string when rejected."
+      explanation:
+        type: string
+        description: "Brief human-readable explanation of what the generated constraint does"
+      rejected:
+        type: boolean
+        description: "True if the preference cannot be generated (unobservable predicates, external data required, etc.)"
+      reject_reason:
+        anyOf:
+          - type: string
+          - type: "null"
+        description: "Reason for rejection when rejected is true, null otherwise"
+      referenced_modules:
+        type: array
+        items:
+          type: string
+        description: "Every specific module code (e.g. pm1, msc — not type codes like p/b/im, not the m set) that appears in asp_code. Must exactly match what asp_code actually references. Empty list if the fragment references no specific module, or if rejected."
+    required:
+      - asp_code
+      - explanation
+      - rejected
+      - reject_reason
+      - referenced_modules
+    additionalProperties: false

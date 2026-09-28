@@ -1,0 +1,40 @@
+{
+  "cogsys_courses": {
+    "count": 20,
+    "metadata_fields": [
+      "semester",
+      "module",
+      "title",
+      "type"
+    ],
+    "sample": {
+      "id": "fm1",
+      "metadata": {
+        "semester": "wise2526",
+        "module": "fm1",
+        "title": "Foundations of Mathematics",
+        "type": "bridge"
+      },
+      "document": "module code: fm1 - Foundations of Mathematics"
+    }
+  },
+  "cogsys_modules": {
+    "count": 17,
+    "metadata_fields": [
+      "sem",
+      "type",
+      "title",
+      "module"
+    ],
+    "sample": {
+      "id": "fm1",
+      "metadata": {
+        "sem": "w",
+        "type": "bridge",
+        "title": "Foundations of Mathematics",
+        "module": "fm1"
+      },
+      "document": "Module code: fm1. Title: Foundations of Mathematics"
+    }
+  }
+}

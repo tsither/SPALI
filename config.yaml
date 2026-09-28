@@ -1,0 +1,19 @@
+# Stable default configuration for the study planner
+# Study program configuration
+study_program: cogsys
+semester: sose26 # Options: wise2526, sose26
+
+encoding: asp/lp/encoding.lp
+
+# API settings
+# Note: ANTHROPIC_API_KEY and VOYAGE_API_KEY must be set as environment variables
+extraction_model: claude-sonnet-4-6
+embed_model: voyage-3-large
+
+# Database settings
+db_path: /db/chroma
+
+# ASP formatting settings
+asp:
+  quoted_fields:
+    - title

@@ -1,0 +1,435 @@
+# Cognitive Systems (M.Sc.) - University of Potsdam
+id: cogsys
+name: "Cognitive Systems (M.Sc.)"
+description: "Master's program in Cognitive Systems at University of Potsdam"
+
+credits:
+  bm: 9
+  fm: 6
+  am: 6
+  pm: 12
+  im: 15
+  msc: 30
+
+modules:
+  - id: fm1
+    title: "Foundations of Mathematics"
+    type: bridge
+    document: "Module code: fm1. Title: Foundations of Mathematics"
+    module: fm1
+    sem: w
+
+  - id: fm2
+    title: "Foundations of Computer Science"
+    type: bridge
+    document: "Module code: fm2. Title: Foundations of Computer Science"
+    module: fm2
+    sem: w
+
+  - id: fm3
+    title: "Foundations of Linguistics"
+    type: bridge
+    document: "Module code: fm3. Title: Foundations of Linguistics"
+    module: fm3
+    sem: w
+
+  - id: bm1
+    title: "Basic module 1 (Advanced Natural Language Processing)"
+    type: mandatory
+    document: "Module code: bm1. Title: Basic module 1 (ANLP). Also known as Advanced Natural Language Processing."
+    module: bm1
+    sem: w
+
+  - id: bm2
+    title: "Basic module 2 (Machine Learning 1)"
+    type: mandatory
+    document: "Module code: bm2. Title: Basic module 2 (IDML 1). Also known as Intelligente Datenanalyse & Maschinelles Lernen 1 or Machine Learning."
+    module: bm2
+    sem: s
+
+  - id: bm3
+    title: "Basic module 3 (Answer Set Programming - ASP)"
+    type: mandatory
+    document: "Module code: bm3. Title: Basic module 3 (ASP). Advanced Problem Solving Techniques. Answer Set Programming.)"
+    module: bm3
+    sem: w
+
+  - id: am11
+    title: "Advanced module 1-1"
+    type: elective
+    document: "Module code: am11. Title: Advanced Module 1-1."
+    module: am11
+    sem: "w,s"
+
+  - id: am12
+    title: "Advanced module 1-2"
+    type: elective
+    document: "Module code: am12. Title: Advanced Module 1-2."
+    module: am12
+    sem: "w,s"
+
+  - id: am21
+    title: "Advanced module 2-1"
+    type: elective
+    document: "Module code: am21. Title: Advanced Module 2-1."
+    module: am21
+    sem: "w,s"
+
+  - id: am22
+    title: "Advanced module 2-2"
+    type: elective
+    document: "Module code: am22. Title: Advanced Module 2-2."
+    module: am22
+    sem: "w,s"
+
+  - id: am31
+    title: "Advanced module 3-1"
+    type: elective
+    document: "Module code: am31. Title: Advanced Module 3-1."
+    module: am31
+    sem: "w,s"
+
+  - id: am32
+    title: "Advanced module 3-2"
+    type: elective
+    document: "Module code: am32. Title: Advanced Module 3-2."
+    module: am32
+    sem: "w,s"
+
+  - id: pm1
+    title: "Project module 1"
+    type: elective
+    document: "Module code: pm1. Title: Project Module 1."
+    module: pm1
+    sem: "w,s"
+
+  - id: pm2
+    title: "Project module 2"
+    type: elective
+    document: "Module code: pm2. Title: Project Module 2."
+    module: pm2
+    sem: "w,s"
+
+  - id: pm3
+    title: "Project module 3"
+    type: elective
+    document: "Module code: pm3. Title: Project Module 3."
+    module: pm3
+    sem: "w,s"
+
+  - id: im
+    title: "Individual module"
+    type: mandatory
+    document: "Module code: im. Title: Individual Module."
+    module: im
+    sem: "w,s"
+
+  - id: msc
+    title: "Thesis module"
+    type: mandatory
+    document: "Module code: msc. Title: Thesis Module."
+    module: msc
+    sem: "w,s"
+
+courses:
+  - id: fm1
+    title: "Foundations of Mathematics"
+    type: bridge
+    document: "module code: fm1 - Foundations of Mathematics"
+    module: fm1
+    module_type: fm
+    semester: wise2526
+
+  - id: fm2
+    title: "Foundations of Computer Science"
+    type: bridge
+    document: "module code: fm2 - Foundations of Computer Science"
+    module: fm2
+    module_type: fm
+    semester: wise2526
+
+  - id: fm3
+    title: "Foundations of Linguistics"
+    type: bridge
+    document: "module code: fm3 - Foundations of Linguistics"
+    module: fm3
+    module_type: fm
+    semester: wise2526
+
+  - id: anlp
+    title: "Advanced Natural Language Processing"
+    type: mandatory
+    document: "Advanced Natural Language Processing"
+    module: bm1
+    module_type: bm
+    semester: wise2526
+
+  - id: ml1
+    title: "Intelligente Datenanalyse & Maschinelles Lernen 1"
+    type: mandatory
+    document: "Intelligente Datenanalyse & Maschinelles Lernen 1, Machine learning 1"
+    module: bm2
+    module_type: bm
+    semester: sose26
+
+  - id: asp
+    title: "Answer Set Programming - ASP"
+    type: mandatory
+    document: "Answer Set Programming - ASP"
+    module: bm3
+    module_type: bm
+    semester: wise2526
+
+  - id: phonological_cognition
+    title: "Phonological Cognition"
+    type: elective
+    document: "Phonological Cognition"
+    module: "am11,am12"
+    module_type: am
+    semester: wise2526
+
+  - id: current_highlights_in_nlp
+    title: "Current Highlights in NLP"
+    type: elective
+    document: "Current Highlights in NLP"
+    module: "am11,am12"
+    module_type: am
+    semester: wise2526
+
+  - id: technology_and_democracy
+    title: "Technology and Democracy"
+    type: elective
+    document: "Technology and Democracy"
+    module: "am11,am12"
+    module_type: am
+    semester: wise2526
+
+  - id: bayes1
+    title: "Bayesian Statistical Inference 1"
+    type: elective
+    document: "Bayesian Statistical Inference 1"
+    module: "am21,am22"
+    module_type: am
+    semester: wise2526
+
+  - id: ml2
+    title: "Maschinelles Lernen & Intelligente Datenanalyse II"
+    type: elective
+    document: "Maschinelles Lernen & Intelligente Datenanalyse II, Machine Learning 2"
+    module: "am21,am22"
+    module_type: am
+    semester: wise2526
+
+  - id: applied_causal_inference
+    title: "Applied Causal Inference"
+    type: elective
+    document: "Applied Causal Inference"
+    module: "am31,am32"
+    module_type: am
+    semester: wise2526
+
+  - id: reasoning_with_llms
+    title: "Reasoning with Large Language Models"
+    type: elective
+    document: "Reasoning with Large Language Models"
+    module: "am31,am32"
+    module_type: am
+    semester: wise2526
+
+  - id: mining_opinions_and_arguments
+    title: "Mining Opinions and Arguments"
+    type: elective
+    document: "Mining Opinions and Arguments"
+    module: pm1
+    module_type: pm
+    semester: wise2526
+
+  - id: individual_project_1
+    title: "Individual Project 1"
+    type: elective
+    document: "Individuelles interdisziplinäres Projekt 1 - Individual Project 1"
+    module: pm2
+    module_type: pm
+    semester: wise2526
+
+  - id: individual_project_2
+    title: "Individual Project 2"
+    type: elective
+    document: "Individuelles interdisziplinäres Projekt 2 - Individual Project 2"
+    module: pm2
+    module_type: pm
+    semester: wise2526
+
+  - id: declarative_problem_solving
+    title: "Declarative Problem Solving"
+    type: elective
+    document: "Declarative Problem Solving"
+    module: pm3
+    module_type: pm
+    semester: wise2526
+
+  - id: railway_scheduling
+    title: "Railway Scheduling"
+    type: elective
+    document: "Railway Scheduling"
+    module: pm3
+    module_type: pm
+    semester: wise2526
+
+  - id: individual_module
+    title: "Individual Module"
+    type: mandatory
+    document: "Individual Module"
+    module: im
+    module_type: im
+    semester: wise2526
+
+  - id: master_thesis
+    title: "Master Thesis"
+    type: mandatory
+    document: "Master Thesis"
+    module: msc
+    module_type: msc
+    semester: wise2526
+
+  # ---- SoSe26 courses ----
+
+  # FM bridge modules are winter-only (see modules: sem: w above); no SoSe26 offering.
+
+  # BM2 (ml1 already defined above with semester: sose26)
+
+  # AM11 / AM12
+  - id: atelier_phonology
+    title: "Atelier in Experimental and Computational Phonology"
+    type: elective
+    document: "Atelier in Experimental and Computational Phonology"
+    module: "am11,am12"
+    module_type: am
+    semester: sose26
+
+  - id: current_topics_nlp
+    title: "Current Topics in NLP"
+    type: elective
+    document: "Current Topics in NLP"
+    module: "am11,am12"
+    module_type: am
+    semester: sose26
+
+  - id: whos_this_chatbots
+    title: "Who's this? How to understand chatbots"
+    type: elective
+    document: "Who's this? How to understand chatbots, and what that means for their evaluation, design, and regulation"
+    module: "am11,am12"
+    module_type: am
+    semester: sose26
+
+  # AM21 / AM22
+  - id: bayes2
+    title: "Bayesian Statistical Inference 2"
+    type: elective
+    document: "Bayesian Statistical Inference 2"
+    module: "am21,am22"
+    module_type: am
+    semester: sose26
+
+  - id: graph_neural_networks
+    title: "Graph Neural Networks"
+    type: elective
+    document: "Graph Neural Networks"
+    module: "am21,am22"
+    module_type: am
+    semester: sose26
+
+  # AM31 / AM32
+  - id: advanced_declarative_problem_solving
+    title: "Advanced Declarative Problem Solving and Optimization"
+    type: elective
+    document: "Advanced Declarative Problem Solving and Optimization"
+    module: "am31,am32"
+    module_type: am
+    semester: sose26
+
+  - id: applied_causal_inference
+    title: "Applied Causal Inference"
+    type: elective
+    document: "Applied Causal Inference"
+    module: "am31,am32"
+    module_type: am
+    semester: sose26
+
+  - id: reasoning_with_llms
+    title: "Reasoning with Large Language Models"
+    type: elective
+    document: "Reasoning with Large Language Models"
+    module: "am31,am32"
+    module_type: am
+    semester: sose26
+
+  # PM1 / PM2
+  - id: learning_in_interaction
+    title: "Learning in Interaction"
+    type: elective
+    document: "Learning in Interaction"
+    module: "pm1,pm2"
+    module_type: pm
+    semester: sose26
+
+  - id: building_virtual_environments
+    title: "Building Virtual Environments for Training and Benchmarking Agentive Communicative Systems"
+    type: elective
+    document: "Building Virtual Environments for Training and Benchmarking Agentive Communicative Systems"
+    module: "pm1,pm2"
+    module_type: pm
+    semester: sose26
+
+  # PM2 only
+  - id: individual_project_1
+    title: "Individual Project 1"
+    type: elective
+    document: "Individuelles interdisziplinäres Projekt 1 - Individual Project 1"
+    module: pm2
+    module_type: pm
+    semester: sose26
+
+  - id: individual_project_2
+    title: "Individual Project 2"
+    type: elective
+    document: "Individuelles interdisziplinäres Projekt 2 - Individual Project 2"
+    module: pm2
+    module_type: pm
+    semester: sose26
+
+  # PM3
+  - id: railway_scheduling
+    title: "Railway Scheduling"
+    type: elective
+    document: "Railway Scheduling"
+    module: pm3
+    module_type: pm
+    semester: sose26
+
+  # IM
+  - id: individual_research
+    title: "Individual Research"
+    type: mandatory
+    document: "Individual Research - Individual Research Module"
+    module: im
+    module_type: im
+    semester: sose26
+
+  - id: individual_module
+    title: "Individual Module"
+    type: mandatory
+    document: "Individual Module"
+    module: im
+    module_type: im
+    semester: sose26
+
+  # MSC
+  - id: master_thesis
+    title: "Master Thesis"
+    type: mandatory
+    document: "Master Thesis"
+    module: msc
+    module_type: msc
+    semester: sose26

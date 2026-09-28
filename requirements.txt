@@ -1,0 +1,11 @@
+anthropic
+chromadb==1.4.1
+clingo==5.8.0
+langchain-anthropic
+langchain-core==0.3.83
+numpy==2.0.2
+pydantic==2.12.5
+python-dotenv
+PyYAML==6.0.3
+rich==14.2.0
+voyageai

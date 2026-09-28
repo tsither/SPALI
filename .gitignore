@@ -1,0 +1,39 @@
+.venv/
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+eval/
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+
+# Environment
+.env
+*.local
+
+.claude/
+
+CLAUDE.md
+
+# Runtime audit and evaluation logs
+logs/
+
+# Scratch ASP files
+asp/lp/test.lp
+
+# ChromaDB store (rebuild: python -m setup.build_db <program_id> --replace)
+db/chroma/*/
+db/chroma/chroma.sqlite3
