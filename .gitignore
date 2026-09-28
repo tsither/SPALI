@@ -24,10 +24,6 @@ eval/
 .env
 *.local
 
-.claude/
-
-CLAUDE.md
-
 # Runtime audit and evaluation logs
 logs/
 

@@ -95,8 +95,7 @@ VALID_PREFERENCES = frozenset(
 )
 
 # Enabled at the start of a navigation session. Applied one preference at a
-# time via apply_defaults() — there is no bundle object, so nothing can reset
-# a student's configuration wholesale.
+# time via apply_defaults().
 DEFAULT_PREFERENCES = ("standard_timeline", "credit_balancing", "diversity")
 
 
