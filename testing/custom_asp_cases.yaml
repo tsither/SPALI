@@ -1,0 +1,100 @@
+cases:
+  - id: c01
+    n_semesters: 4
+    input: "I don't want to take more than one project module at a time"
+    intent: "at most 1 PM module per semester"
+
+  - id: c02
+    n_semesters: 6
+    input: "I don't want more than 25 credits in a semester"
+    intent: "penalize semesters over 25 credits"
+
+  - id: c03
+    n_semesters: 6
+    input: "I want credits the earlier semesters to have more credits than later semesters"
+    intent: "credits decrease from semester to semester"
+
+  - id: c04
+    n_semesters: 6
+    input: "can you spread the AMs out instead of cramming them together"
+    intent: "AM modules across multiple distinct semesters"
+
+  - id: c05
+    n_semesters: 6
+    input: "I want to finish the basic modules early"
+    intent: "BM modules in the first half of the plan"
+
+  - id: c06
+    n_semesters: 4
+    input: "no more than two of the advanced ones at a time please"
+    intent: "at most 2 AM modules per semester"
+
+  - id: c07
+    n_semesters: 6
+    input: "I want to take two modules every semester"
+    intent: "only 2 modules per semester"
+
+  - id: c08
+    n_semesters: 4
+    input: "four courses in a semester is the limit"
+    intent: "at most 4 modules per semester"
+
+  - id: c09
+    n_semesters: 5
+    input: "I want the basic modules finished before I start the project modules"
+    intent: "all BM modules before any PM module"
+
+  - id: c10
+    n_semesters: 6
+    input: "I dont want the IM to be the only module I take that semester"
+    intent: "IM should not be the only module in its semester"
+
+  - id: c11
+    n_semesters: 6
+    input: "the back half of my degree should be lighter than the front half"
+    intent: "second-half credits below first-half credits"
+
+  - id: c12
+    n_semesters: 5
+    input: "please don't give me two of the basic modules in the same term"
+    intent: "at most 1 BM module per semester"
+
+  - id: c13
+    n_semesters: 6
+    input: "keep the advanced modules spread over at least three different terms"
+    intent: "AM modules in >= 3 distinct semesters"
+
+  - id: c14
+    n_semesters: 6
+    input: "I'd like all the bms done within my first three terms"
+    intent: "all BM modules in semesters 1-3"
+
+  - id: c15
+    n_semesters: 5
+    input: "I dont want bm1 and the PMs in the same semester"
+    intent: "bm1 and any PM never share a semester"
+
+  - id: c16
+    n_semesters: 4
+    input: "I dont want more than 3 courses in the first semester"
+    intent: "at most 3 modules in semester 1"
+
+  - id: c17
+    n_semesters: 5
+    input: "I want to complete my AMs in the first semester"
+    intent: ""
+
+  - id: c18
+    n_semesters: 6
+    input: "I don't want any PMs in the first semester"
+    intent: "no PM module in semester 1"
+
+  - id: c19
+    n_semesters: 6
+    input: "I want my first semester to be my busiest semester"
+    intent: "first semester is the maximum-credit semester"
+
+  - id: c20
+    n_semesters: 5
+    input: "I want to take my AMs and BMs in the same semesters if possible"
+    intent: "cap combined BM+PM count per semester"

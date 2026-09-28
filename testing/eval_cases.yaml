@@ -1,0 +1,367 @@
+
+cases:
+
+  # ---------------------------------------------------------------------
+  # standard_timeline
+  # ---------------------------------------------------------------------
+
+  - id: st01
+    category: standard_timeline
+    n_semesters: 6
+    input: "I'd like to complete easier modules before harder and more independent modules"
+    expected:
+      route: standard
+      preference: standard_timeline
+      action: enable
+
+  - id: st02
+    category: standard_timeline
+    n_semesters: 6
+    input: "I want to follow a normal program timeline"
+    expected:
+      route: standard
+      preference: standard_timeline
+      action: enable
+
+  - id: st03
+    category: standard_timeline
+    n_semesters: 4
+    input: "let's do the standard progression through the degree"
+    expected:
+      route: standard
+      preference: standard_timeline
+      action: enable
+
+  - id: st04
+    category: standard_timeline
+    n_semesters: 6
+    input: "I want to build up gradually from the introductory modules to the advanced ones"
+    expected:
+      route: standard
+      preference: standard_timeline
+      action: enable
+
+  - id: st05
+    category: standard_timeline
+    n_semesters: 5
+    input: "Show me common study plan trajectories"
+    expected:
+      route: standard
+      preference: standard_timeline
+      action: enable
+
+  # ---------------------------------------------------------------------
+  # credit_balancing
+  # ---------------------------------------------------------------------
+
+  - id: cb01
+    category: credit_balancing
+    n_semesters: 6
+    input: "keep my workload even across the semesters"
+    expected:
+      route: standard
+      preference: credit_balancing
+      action: enable
+
+  - id: cb02
+    category: credit_balancing
+    n_semesters: 6
+    input: "I don't want one term to be way heavier than the others"
+    expected:
+      route: standard
+      preference: credit_balancing
+      action: enable
+
+  - id: cb03
+    category: credit_balancing
+    n_semesters: 4
+    input: "spread the credits evenly please"
+    expected:
+      route: standard
+      preference: credit_balancing
+      action: enable
+
+  - id: cb04
+    category: credit_balancing
+    n_semesters: 5
+    input: "balance the semesters out"
+    expected:
+      route: standard
+      preference: credit_balancing
+      action: enable
+
+  - id: cb05
+    category: credit_balancing
+    n_semesters: 6
+    input: "I want each semester to have roughly the same workload"
+    expected:
+      route: standard
+      preference: credit_balancing
+      action: enable
+
+  # ---------------------------------------------------------------------
+  # diversity
+  # ---------------------------------------------------------------------
+
+  - id: dv01
+    category: diversity
+    n_semesters: 6
+    input: "I want to see study plans that are different from one another"
+    expected:
+      route: standard
+      preference: diversity
+      action: enable
+
+  - id: dv02
+    category: diversity
+    n_semesters: 6
+    input: "Show me more variety in the study plans"
+    expected:
+      route: standard
+      preference: diversity
+      action: enable
+
+  - id: dv03
+    category: diversity
+    n_semesters: 5
+    input: "The study plans look too similar"
+    expected:
+      route: standard
+      preference: diversity
+      action: enable
+
+  - id: dv04
+    category: diversity
+    n_semesters: 4
+    input: "How else could these plans look like?"
+    expected:
+      route: standard
+      preference: diversity
+      action: enable
+
+  - id: dv05
+    category: diversity
+    n_semesters: 6
+    input: "Each plans looks the same"
+    expected:
+      route: standard
+      preference: diversity
+      action: enable
+
+  # ---------------------------------------------------------------------
+  # pin
+  # ---------------------------------------------------------------------
+
+  - id: pn01
+    category: pin
+    n_semesters: 6
+    input: "put bm2 in my second semester"
+    expected:
+      route: pin
+      constraint_type: pin_module_semester
+      module: bm2
+      semester: 2
+
+  - id: pn02
+    category: pin
+    n_semesters: 6
+    input: "I want to take the thesis in semester 6"
+    expected:
+      route: pin
+      constraint_type: pin_module_semester
+      module: msc
+      semester: 6
+
+  - id: pn03
+    category: pin
+    n_semesters: 5
+    input: "keep pm2 out of my third semester"
+    expected:
+      route: pin
+      constraint_type: exclude_module_semester
+      module: pm2
+      semester: 3
+
+  - id: pn04
+    category: pin
+    n_semesters: 6
+    input: "I really don't want im in semester 1"
+    expected:
+      route: pin
+      constraint_type: exclude_module_semester
+      module: im
+      semester: 1
+
+  - id: pn05
+    category: pin
+    n_semesters: 6
+    input: "schedule am31 for my last semester"
+    expected:
+      route: pin
+      constraint_type: pin_module_semester
+      module: am31
+      semester: 6
+
+  # ---------------------------------------------------------------------
+  # custom
+  # ---------------------------------------------------------------------
+
+  - id: c01
+    category: custom
+    n_semesters: 4
+    input: "I don't want to take more than one project module at a time"
+    intent: "at most 1 PM module per semester"
+    expected:
+      route: custom
+
+  - id: c02
+    category: custom
+    n_semesters: 6
+    input: "I don't want more than 25 credits in a semester"
+    intent: "penalize semesters over 25 credits"
+    expected:
+      route: custom
+
+  - id: c03
+    category: custom
+    n_semesters: 6
+    input: "I want credits the earlier semesters to have more credits than later semesters"
+    intent: "credits decrease from semester to semester"
+    expected:
+      route: custom
+
+  - id: c04
+    category: custom
+    n_semesters: 6
+    input: "can you spread the AMs out instead of cramming them together"
+    intent: "AM modules across multiple distinct semesters"
+    expected:
+      route: custom
+
+  - id: c05
+    category: custom
+    n_semesters: 6
+    input: "I want to finish the basic modules early"
+    intent: "BM modules in the first half of the plan"
+    expected:
+      route: custom
+
+  - id: c06
+    category: custom
+    n_semesters: 4
+    input: "no more than two of the advanced ones at a time please"
+    intent: "at most 2 AM modules per semester"
+    expected:
+      route: custom
+
+  - id: c07
+    category: custom
+    n_semesters: 6
+    input: "I want to take two modules every semester"
+    intent: "only 2 modules per semester"
+    expected:
+      route: custom
+
+  - id: c08
+    category: custom
+    n_semesters: 4
+    input: "four courses in a semester is the limit"
+    intent: "at most 4 modules per semester"
+    expected:
+      route: custom
+
+  - id: c09
+    category: custom
+    n_semesters: 5
+    input: "I want the basic modules finished before I start the project modules"
+    intent: "all BM modules before any PM module"
+    expected:
+      route: custom
+
+  - id: c10
+    category: custom
+    n_semesters: 6
+    input: "I dont want the IM to be the only module I take that semester"
+    intent: "IM should not be the only module in its semester"
+    expected:
+      route: custom
+
+  - id: c11
+    category: custom
+    n_semesters: 6
+    input: "the back half of my degree should be lighter than the front half"
+    intent: "second-half credits below first-half credits"
+    expected:
+      route: custom
+
+  - id: c12
+    category: custom
+    n_semesters: 5
+    input: "please don't give me two of the basic modules in the same term"
+    intent: "at most 1 BM module per semester"
+    expected:
+      route: custom
+
+  - id: c13
+    category: custom
+    n_semesters: 6
+    input: "keep the advanced modules spread over at least three different terms"
+    intent: "AM modules in >= 3 distinct semesters"
+    expected:
+      route: custom
+
+  - id: c14
+    category: custom
+    n_semesters: 6
+    input: "I'd like all the bms done within my first three terms"
+    intent: "all BM modules in semesters 1-3"
+    expected:
+      route: custom
+
+  - id: c15
+    category: custom
+    n_semesters: 5
+    input: "I dont want bm1 and the PMs in the same semester"
+    intent: "bm1 and any PM never share a semester"
+    expected:
+      route: custom
+
+  - id: c16
+    category: custom
+    n_semesters: 4
+    input: "I dont want more than 3 courses in the first semester"
+    intent: "at most 3 modules in semester 1"
+    expected:
+      route: custom
+
+  - id: c17
+    category: custom
+    n_semesters: 5
+    input: "I want to complete my AMs in the first semester"
+    intent: "all AM modules in semester 1"
+    expected:
+      route: custom
+
+  - id: c18
+    category: custom
+    n_semesters: 6
+    input: "I don't want any PMs in the first semester"
+    intent: "no PM module in semester 1"
+    expected:
+      route: custom
+
+  - id: c19
+    category: custom
+    n_semesters: 6
+    input: "I want my first semester to be my busiest semester"
+    intent: "first semester is the maximum-credit semester"
+    expected:
+      route: custom
+
+  - id: c20
+    category: custom
+    n_semesters: 5
+    input: "I want to take my AMs and BMs in the same semesters if possible"
+    intent: "cap combined BM+PM count per semester"
+    expected:
+      route: custom
