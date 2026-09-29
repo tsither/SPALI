@@ -256,7 +256,13 @@ def collect_completed_modules(state: StudentState) -> StudentState:
 
         for canonical, semester in intent.get("add", []):
             # canonical is (title, module_code) tuple
-            if int(semester) >= state.current_semester:
+            # LLM returns "N/A" when no semester was given, so ask for it
+            while not str(semester).strip().isdigit():
+                semester = user_input(
+                    f"In which semester did you complete {canonical[0]}? "
+                )
+            semester = int(semester)
+            if semester >= state.current_semester:
                 ai_print(
                     f"\n{canonical[0]} can't be marked completed in semester {semester} — "
                     f"it must be earlier than your current semester ({state.current_semester}).\n"
