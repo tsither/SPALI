@@ -14,13 +14,21 @@ def compute_brave_atoms(ctl: Control) -> tuple[bool, set]:
     - brave_atoms: set of all atoms appearing in at least one model.
     """
     ctl.configuration.solve.enum_mode = "brave"  # type: ignore
+    # Weak constraints (diversity/partial-assignment) put clingo in optimization
+    # mode, which stops brave enumeration after the first optimal model.
+    # Ignore optimization here so the union covers all stable models.
+    prev_opt_mode = ctl.configuration.solve.opt_mode  # type: ignore
+    ctl.configuration.solve.opt_mode = "ignore"  # type: ignore
 
     brave = set()
     saw_model = False
-    with ctl.solve(yield_=True) as handle:
-        for model in handle:
-            saw_model = True
-            brave |= set(model.symbols(shown=True))
+    try:
+        with ctl.solve(yield_=True) as handle:
+            for model in handle:
+                saw_model = True
+                brave |= set(model.symbols(shown=True))
+    finally:
+        ctl.configuration.solve.opt_mode = prev_opt_mode  # type: ignore
 
     return saw_model, brave
 
