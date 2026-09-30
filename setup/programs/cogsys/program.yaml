@@ -409,14 +409,6 @@ courses:
     semester: sose26
 
   # IM
-  - id: individual_research
-    title: "Individual Research"
-    type: mandatory
-    document: "Individual Research - Individual Research Module"
-    module: im
-    module_type: im
-    semester: sose26
-
   - id: individual_module
     title: "Individual Module"
     type: mandatory

@@ -134,7 +134,7 @@ def build_program(program_id: str, replace: bool = False, semester: str = None):
     # Build courses
     courses = [
         CourseDocument(
-            id=c["id"],
+            id=f"{c['id']}_{c['semester']}",
             title=c["title"],
             type=c["type"],
             document=c["document"],
